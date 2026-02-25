@@ -1,0 +1,1 @@
+// welcome screen for the onboarding phase
