@@ -12,7 +12,7 @@ const onboardingWelcome = () => {
         <Pressable
           onPress={() => {
             // add function to save user input
-            router.push('/(onboarding)/personalInfo');
+            router.push('/(onboarding)/personalInfoScreen');
           }}
           style={({ pressed }) => [
             styles.nextButtonStyle,

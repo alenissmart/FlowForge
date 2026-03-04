@@ -3,11 +3,11 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-const signIn = () => {
+const signUp = () => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#F5B3B6', '#C94B52']} style={styles.gradient}>
-        <Text style={styles.title}>Sign In Template</Text>
+        <Text style={styles.title}>Sign Up Template</Text>
 
         <Pressable
           onPress={() => {
@@ -21,7 +21,7 @@ const signIn = () => {
             },
           ]}
         >
-          <Text style={styles.mainButtonText}>Sign In</Text>
+          <Text style={styles.mainButtonText}>Sign Up</Text>
         </Pressable>
 
         <Pressable
@@ -51,7 +51,7 @@ const signIn = () => {
   );
 };
 
-export default signIn;
+export default signUp;
 
 const styles = StyleSheet.create({
   container: {
@@ -60,9 +60,10 @@ const styles = StyleSheet.create({
   },
   title: {
     color: 'black',
-    fontSize: 50,
+    fontSize: 35,
     textAlign: 'center',
     fontWeight: '600',
+    marginBottom: 50,
   },
   gradient: {
     flex: 1,

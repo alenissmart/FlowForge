@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const settingPage = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>settingPage template</Text>
+      <Text style={styles.title}>Settings Page template</Text>
     </View>
   );
 };

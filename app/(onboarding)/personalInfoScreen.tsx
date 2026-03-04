@@ -12,7 +12,7 @@ const presonalInfoScreen = () => {
         <Pressable
           onPress={() => {
             // add function to save user input
-            router.push('/(onboarding)/preferences');
+            router.push('/(onboarding)/preferencesScreen');
           }}
           style={({ pressed }) => [
             styles.nextButtonStyle,

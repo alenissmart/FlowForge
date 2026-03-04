@@ -3,16 +3,16 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-const preferencesScreen = () => {
+const signIn = () => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#F5B3B6', '#C94B52']} style={styles.gradient}>
-        <Text style={styles.title}>preferences Screen Template</Text>
+        <Text style={styles.title}>Sign In Template</Text>
 
         <Pressable
           onPress={() => {
             // add function to save user input
-            router.push('/(onboarding)/scheduleInfo');
+            router.replace('/(onboarding)');
           }}
           style={({ pressed }) => [
             styles.nextButtonStyle,
@@ -21,7 +21,7 @@ const preferencesScreen = () => {
             },
           ]}
         >
-          <Text style={styles.mainButtonText}>Done</Text>
+          <Text style={styles.mainButtonText}>Sign In</Text>
         </Pressable>
 
         <Pressable
@@ -51,7 +51,7 @@ const preferencesScreen = () => {
   );
 };
 
-export default preferencesScreen;
+export default signIn;
 
 const styles = StyleSheet.create({
   container: {

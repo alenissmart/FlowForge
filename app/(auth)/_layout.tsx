@@ -4,8 +4,8 @@ export default function OnboardingLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="signIn" />
-      <Stack.Screen name="signUp" />
+      <Stack.Screen name="signInScreen" />
+      <Stack.Screen name="signUpScreen" />
     </Stack>
   );
 }

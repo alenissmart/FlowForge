@@ -19,7 +19,7 @@ const authIndex = () => {
         <Pressable
           onPress={() => {
             // add function to save user input
-            router.push('/(auth)/signUp');
+            router.push('/(auth)/signUpScreen');
           }}
           style={({ pressed }) => [
             styles.getStartedButtonStyle,
@@ -36,7 +36,7 @@ const authIndex = () => {
         <Pressable
           onPress={() => {
             // function to save user input
-            router.push('/(auth)/signIn');
+            router.push('/(auth)/signInScreen');
           }}
         >
           {({ pressed }) => (

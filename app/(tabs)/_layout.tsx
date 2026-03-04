@@ -22,11 +22,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="activity"
+        name="activityScreen"
         options={{
-          title: 'activity',
+          title: 'Activity',
           tabBarIcon: ({ color }) => (
             <MaterialIcons size={28} name={'local-activity'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settingsScreen"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons size={28} name={'settings'} color={color} />
           ),
         }}
       />

@@ -4,10 +4,10 @@ export default function OnboardingLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="personalInfo" />
-      <Stack.Screen name="preferences" />
-      <Stack.Screen name="scheduleInfo" />
-      <Stack.Screen name="done" />
+      <Stack.Screen name="personalInfoScreen" />
+      <Stack.Screen name="preferencesScreen" />
+      <Stack.Screen name="scheduleInfoScreen" />
+      <Stack.Screen name="doneScreen" />
     </Stack>
   );
 }

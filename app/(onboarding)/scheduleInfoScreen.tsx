@@ -12,7 +12,7 @@ const scheduleInfoScreen = () => {
         <Pressable
           onPress={() => {
             // add function to save user input
-            router.push('/(onboarding)/done');
+            router.push('/(onboarding)/doneScreen');
           }}
           style={({ pressed }) => [
             styles.nextButtonStyle,
