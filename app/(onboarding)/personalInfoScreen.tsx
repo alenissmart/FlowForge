@@ -1,9 +1,20 @@
+import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const presonalInfoScreen = () => {
+
+  const [wakeTime, setWakeTime] = useState("7:00 AM");
+  const [sleepTime, setSleepTime] = useState("11:00 PM");
+
+  const times = [
+    "5:00 AM","6:00 AM","7:00 AM","8:00 AM","9:00 AM","10:00 AM","11:00 AM",
+    "12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM",
+    "6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM","11:00 PM","12:00 AM"
+  ];
+
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#F5B3B6', '#C94B52']} style={styles.gradient}>
@@ -27,15 +38,34 @@ const presonalInfoScreen = () => {
           placeholderTextColor="#aaa"
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="When do you feel most productive?"
-          placeholderTextColor="#aaa"
-        />
+        <Text style={styles.label}>Wake up time</Text>
+
+        <View style={styles.dropdown}>
+          <Picker
+            selectedValue={wakeTime}
+            onValueChange={(itemValue) => setWakeTime(itemValue)}
+          >
+            {times.map((t) => (
+              <Picker.Item key={t} label={t} value={t} />
+            ))}
+          </Picker>
+        </View>
+
+        <Text style={styles.label}>Sleep time</Text>
+
+        <View style={styles.dropdown}>
+          <Picker
+            selectedValue={sleepTime}
+            onValueChange={(itemValue) => setSleepTime(itemValue)}
+          >
+            {times.map((t) => (
+              <Picker.Item key={t} label={t} value={t} />
+            ))}
+          </Picker>
+        </View>
 
         <Pressable
           onPress={() => {
-            // add function to save user input
             router.push('/(onboarding)/preferencesScreen');
           }}
           style={({ pressed }) => [
@@ -50,7 +80,6 @@ const presonalInfoScreen = () => {
 
         <Pressable
           onPress={() => {
-            // function to save user input
             router.back();
           }}
         >
@@ -102,7 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     color: '#2b2b2b',
-    marginBottom: 40,
+    marginBottom: 30,
   },
 
   input: {
@@ -115,13 +144,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
+  label: {
+    width: '90%',
+    fontSize: 18,
+    marginTop: 10,
+    marginBottom: 5,
+    color: 'black',
+  },
+
+  dropdown: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    marginBottom: 20,
+  },
+
   nextButtonStyle: {
     width: 200,
     height: 60,
     borderRadius: 15,
     backgroundColor: 'rgba(163,51,58,1)',
     justifyContent: 'center',
-    marginTop: 40,
+    marginTop: 30,
   },
 
   mainButtonText: {
