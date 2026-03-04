@@ -5,9 +5,19 @@ const prettierPlugin = require('eslint-plugin-prettier');
 
 module.exports = defineConfig([
   expoConfig,
-  prettierConfig, // disables conflicting formatting rules
+  prettierConfig,
   {
-    ignores: ['dist/*'],
+    ignores: [
+      'dist/*',
+      'node_modules',
+      '.expo',
+      'build',
+      'web-build',
+      'android',
+      'ios',
+      'expo-env.d.ts',
+      '*.log',
+    ],
     plugins: {
       prettier: prettierPlugin,
     },
