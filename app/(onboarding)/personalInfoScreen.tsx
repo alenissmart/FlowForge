@@ -2,21 +2,20 @@ import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const presonalInfoScreen = () => {
-
-  const [wakeTime, setWakeTime] = useState("7:00 AM");
-  const [sleepTime, setSleepTime] = useState("11:00 PM");
+  const [wakeTime, setWakeTime] = useState('7:00 AM');
+  const [sleepTime, setSleepTime] = useState('11:00 PM');
 
   const times = [
-    "5:00 AM","6:00 AM","7:00 AM","8:00 AM","9:00 AM","10:00 AM","11:00 AM",
-    "12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM",
-    "6:00 PM","7:00 PM","8:00 PM","9:00 PM","10:00 PM","11:00 PM","12:00 AM"
+    '5:00 AM','6:00 AM','7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM',
+    '12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM',
+    '6:00 PM','7:00 PM','8:00 PM','9:00 PM','10:00 PM','11:00 PM','12:00 AM'
   ];
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <LinearGradient colors={['#F5B3B6', '#C94B52']} style={styles.gradient}>
 
         <Text style={styles.title}>Tell us about you</Text>
@@ -44,6 +43,7 @@ const presonalInfoScreen = () => {
           <Picker
             selectedValue={wakeTime}
             onValueChange={(itemValue) => setWakeTime(itemValue)}
+            itemStyle={{ color: 'black' }}
           >
             {times.map((t) => (
               <Picker.Item key={t} label={t} value={t} />
@@ -57,6 +57,7 @@ const presonalInfoScreen = () => {
           <Picker
             selectedValue={sleepTime}
             onValueChange={(itemValue) => setSleepTime(itemValue)}
+            itemStyle={{ color: 'black' }}
           >
             {times.map((t) => (
               <Picker.Item key={t} label={t} value={t} />
@@ -100,7 +101,7 @@ const presonalInfoScreen = () => {
         </Pressable>
 
       </LinearGradient>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -108,15 +109,15 @@ export default presonalInfoScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'column',
+    flexGrow: 1,
   },
 
   gradient: {
     flex: 1,
     padding: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    minHeight: '100%',
   },
 
   title: {
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 38,
     textAlign: 'center',
     fontWeight: '700',
+    marginTop: 60,
     marginBottom: 10,
   },
 
