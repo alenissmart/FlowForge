@@ -32,7 +32,7 @@ const signIn = () => {
           <Pressable
             onPress={() => {
               // add function to save user input
-              router.replace('/(onboarding)');
+              router.push('/(onboarding)');
             }}
             style={({ pressed }) => [
               styles.nextButtonStyle,
@@ -52,7 +52,7 @@ const signIn = () => {
           <Pressable
             onPress={() => {
               // function to save user input
-              router.replace('/signUpScreen');
+              router.push('/signUpScreen');
             }}
           >
             {({ pressed }) => (
