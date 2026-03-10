@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     color: 'rgba(0,0,0,1)',
     marginBottom: 15,
   },
+
   nextButtonStyle: {
     width: 200,
     height: 60,
@@ -116,15 +117,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 30,
   },
+
   mainButtonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 22,
     textAlign: 'center',
     fontWeight: '700',
   },
+
   smallText: {
     marginTop: 15,
-    color: 'white',
     fontSize: 18,
     textAlign: 'center',
   },
