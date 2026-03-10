@@ -122,15 +122,16 @@ const styles = StyleSheet.create({
 
   title: {
     color: 'black',
-    fontSize: 38,
+    fontSize: 40,
     textAlign: 'center',
     fontWeight: '700',
     marginTop: 60,
     marginBottom: 10,
   },
-
-  subtitle: {
-    fontSize: 20,
+  aboutText: {
+    color: 'rgba(0, 0, 0, .6)',
+    fontSize: 16,
+    padding: 20,
     textAlign: 'center',
     color: '#2b2b2b',
     marginBottom: 30,
@@ -141,9 +142,8 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: 'white',
     borderRadius: 15,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 18,
+    color: 'rgba(0,0,0,1)',
+    marginBottom: 15,
   },
 
   label: {
