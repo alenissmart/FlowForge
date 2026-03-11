@@ -16,7 +16,7 @@ const signIn = () => {
         <>
           <TextInput
             style={styles.inputs}
-            placeholder="Username"
+            placeholder="Email"
             placeholderTextColor="rgba(180, 180, 180, 1)"
             keyboardType="default"
           />
@@ -31,7 +31,6 @@ const signIn = () => {
 
           <Pressable
             onPress={() => {
-              // add function to save user input
               router.replace('/(onboarding)');
             }}
             style={({ pressed }) => [

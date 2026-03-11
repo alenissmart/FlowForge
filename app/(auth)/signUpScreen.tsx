@@ -1,9 +1,74 @@
 import { router } from 'expo-router';
-import React from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
+import { auth } from '../../config/firebase';
 import AuthScreenLayout from '../screenTemplate';
 
 const signUp = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validateInputs = () => {
+    if (!email.trim()) {
+      return 'Please enter your email.';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return 'Please enter a valid email address.';
+    }
+
+    if (!password) {
+      return 'Please enter your password.';
+    }
+
+    if (password.length < 6) {
+      return 'Password must be at least 6 characters.';
+    }
+
+    return '';
+  };
+
+  const handleSignUp = async () => {
+    setErrorMessage('');
+
+    const validationError = validateInputs();
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.replace('/(onboarding)');
+    } catch (error: any) {
+      console.log('Firebase sign-in error:', error);
+
+      switch (error.code) {
+        case 'auth/invalid-email':
+          setErrorMessage('That email address is invalid.');
+          break;
+        case 'auth/user-not-found':
+          setErrorMessage('No account was found with that email.');
+          break;
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          setErrorMessage('Incorrect email or password.');
+          break;
+        case 'auth/too-many-requests':
+          setErrorMessage('Too many attempts. Please try again later.');
+          break;
+        default:
+          setErrorMessage('Sign-in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <AuthScreenLayout
       headerContent={
@@ -16,9 +81,13 @@ const signUp = () => {
         <>
           <TextInput
             style={styles.inputs}
-            placeholder="Username"
+            placeholder="Email"
             placeholderTextColor="rgba(180, 180, 180, 1)"
             keyboardType="default"
+            onChangeText={(text) => {
+              setEmail(text);
+              if (errorMessage) setErrorMessage('');
+            }}
           />
 
           <TextInput
@@ -27,6 +96,10 @@ const signUp = () => {
             placeholderTextColor="rgba(180, 180, 180, 1)"
             keyboardType="default"
             secureTextEntry
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errorMessage) setErrorMessage('');
+            }}
           />
 
           <TextInput
@@ -36,10 +109,13 @@ const signUp = () => {
             keyboardType="default"
             secureTextEntry
           />
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
           <Pressable
             onPress={() => {
               // add function to save user input
-              router.replace('/(onboarding)');
+              handleSignUp();
             }}
             style={({ pressed }) => [
               styles.nextButtonStyle,
@@ -48,7 +124,9 @@ const signUp = () => {
               },
             ]}
           >
-            <Text style={styles.mainButtonText}>Sign Up</Text>
+            <Text style={styles.mainButtonText}>
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </Text>
           </Pressable>
         </>
       }
@@ -140,6 +218,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(163,51,58,1)',
     justifyContent: 'center',
     marginTop: 30,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    marginBottom: 8,
+    fontSize: 14,
   },
   mainButtonText: {
     color: 'white',
