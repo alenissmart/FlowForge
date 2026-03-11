@@ -3,7 +3,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
 import AuthScreenLayout from '../screenTemplate';
 
-const signIn = () => {
+const signInScreen = () => {
   return (
     <AuthScreenLayout
       headerContent={
@@ -98,7 +98,7 @@ const signIn = () => {
   );
 };
 
-export default signIn;
+export default signInScreen;
 
 const styles = StyleSheet.create({
   title: {

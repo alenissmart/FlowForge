@@ -1,72 +1,29 @@
 import { router } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
-import { auth } from '../../config/firebase';
+import { validateSignUp } from '../../logic/signUpValidation';
+import { signUp } from '../../services/authServices';
 import AuthScreenLayout from '../screenTemplate';
 
-const signUp = () => {
+const signUpScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const validateInputs = () => {
-    if (!email.trim()) {
-      return 'Please enter your email.';
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      return 'Please enter a valid email address.';
-    }
-
-    if (!password) {
-      return 'Please enter your password.';
-    }
-
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters.';
-    }
-
-    return '';
-  };
 
   const handleSignUp = async () => {
     setErrorMessage('');
 
-    const validationError = validateInputs();
+    const validationError = validateSignUp(email, password);
     if (validationError) {
       setErrorMessage(validationError);
       return;
     }
 
     try {
-      setLoading(true);
-      await createUserWithEmailAndPassword(auth, email, password);
+      signUp(email, password);
       router.replace('/(onboarding)');
     } catch (error: any) {
       console.log('Firebase sign-in error:', error);
-
-      switch (error.code) {
-        case 'auth/invalid-email':
-          setErrorMessage('That email address is invalid.');
-          break;
-        case 'auth/user-not-found':
-          setErrorMessage('No account was found with that email.');
-          break;
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-          setErrorMessage('Incorrect email or password.');
-          break;
-        case 'auth/too-many-requests':
-          setErrorMessage('Too many attempts. Please try again later.');
-          break;
-        default:
-          setErrorMessage('Sign-in failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
     }
   };
   return (
@@ -124,9 +81,7 @@ const signUp = () => {
               },
             ]}
           >
-            <Text style={styles.mainButtonText}>
-              {loading ? 'Signing Up...' : 'Sign Up'}
-            </Text>
+            <Text style={styles.mainButtonText}>Sign Up</Text>
           </Pressable>
         </>
       }
@@ -184,7 +139,7 @@ const signUp = () => {
   );
 };
 
-export default signUp;
+export default signUpScreen;
 
 const styles = StyleSheet.create({
   title: {
