@@ -1,18 +1,19 @@
 import { signIn } from '@/services/authServices';
+import { redirectAfterSignIn } from '@/services/redirectServices';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
 import AuthScreenLayout from '../screenTemplate';
 
-const signInScreen = () => {
+const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSignIn = async () => {
     try {
-      await signIn(email, password);
-      router.replace('/(onboarding)');
+      const userCredentials = await signIn(email, password);
+      redirectAfterSignIn(userCredentials);
     } catch (error: any) {
       setErrorMessage('Incorrect Email or Password');
     }
@@ -31,7 +32,7 @@ const signInScreen = () => {
             style={styles.inputs}
             placeholder="Email"
             placeholderTextColor="rgba(180, 180, 180, 1)"
-            keyboardType="default"
+            keyboardType="email-address"
             onChangeText={(text) => {
               setEmail(text);
               if (errorMessage) setErrorMessage('');
@@ -121,7 +122,7 @@ const signInScreen = () => {
   );
 };
 
-export default signInScreen;
+export default SignInScreen;
 
 const styles = StyleSheet.create({
   title: {
