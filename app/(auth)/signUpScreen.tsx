@@ -1,9 +1,32 @@
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
+import { validateSignUp } from '../../logic/signUpValidation';
+import { signUp } from '../../services/authServices';
 import AuthScreenLayout from '../screenTemplate';
 
-const signUp = () => {
+const signUpScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSignUp = async () => {
+    setErrorMessage('');
+
+    const validationError = validateSignUp(email, password);
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
+
+    try {
+      signUp(email, password);
+      router.replace('/(onboarding)');
+    } catch (error: any) {
+      setErrorMessage('Error signing up');
+      console.log('Firebase sign-in error:', error);
+    }
+  };
   return (
     <AuthScreenLayout
       headerContent={
@@ -16,9 +39,13 @@ const signUp = () => {
         <>
           <TextInput
             style={styles.inputs}
-            placeholder="Username"
+            placeholder="Email"
             placeholderTextColor="rgba(180, 180, 180, 1)"
             keyboardType="default"
+            onChangeText={(text) => {
+              setEmail(text);
+              if (errorMessage) setErrorMessage('');
+            }}
           />
 
           <TextInput
@@ -27,6 +54,10 @@ const signUp = () => {
             placeholderTextColor="rgba(180, 180, 180, 1)"
             keyboardType="default"
             secureTextEntry
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errorMessage) setErrorMessage('');
+            }}
           />
 
           <TextInput
@@ -36,10 +67,13 @@ const signUp = () => {
             keyboardType="default"
             secureTextEntry
           />
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
           <Pressable
             onPress={() => {
               // add function to save user input
-              router.replace('/(onboarding)');
+              handleSignUp();
             }}
             style={({ pressed }) => [
               styles.nextButtonStyle,
@@ -106,7 +140,7 @@ const signUp = () => {
   );
 };
 
-export default signUp;
+export default signUpScreen;
 
 const styles = StyleSheet.create({
   title: {
@@ -140,6 +174,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(163,51,58,1)',
     justifyContent: 'center',
     marginTop: 30,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    marginBottom: 8,
+    fontSize: 14,
   },
   mainButtonText: {
     color: 'white',
