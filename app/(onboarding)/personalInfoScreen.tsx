@@ -158,18 +158,33 @@ const personalInfoScreen = () => {
 export default personalInfoScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+
+  gradient: {
+    flex: 1,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    minHeight: '100%',
+  },
+
   title: {
     color: 'black',
     fontSize: 40,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
+    marginTop: 60,
+    marginBottom: 10,
   },
   aboutText: {
     color: 'rgba(0, 0, 0, .6)',
     fontSize: 16,
     padding: 20,
     textAlign: 'center',
-    marginBottom: 60,
+    color: '#2b2b2b',
+    marginBottom: 30,
   },
   errorText: {
     color: 'red',
