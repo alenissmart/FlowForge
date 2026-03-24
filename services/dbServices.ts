@@ -107,6 +107,20 @@ export async function updateUserPreferences(
     });
 }
 
+export async function updateUserSchedule(userId: string, schedule: string) {
+  const docRef = doc(db, 'users', userId);
+  const data = {
+    base64schedule: schedule,
+  };
+  await setDoc(docRef, data, { merge: true })
+    .then(() => {
+      console.log('Schedule successfully written or updated!');
+    })
+    .catch((error) => {
+      console.error('Error writing or updating document: ', error);
+    });
+}
+
 export async function setDoneOnboarding(userId: string) {
   const docRef = doc(db, 'users', userId);
   const data = {
