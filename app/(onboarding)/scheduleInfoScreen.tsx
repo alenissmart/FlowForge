@@ -1,9 +1,45 @@
+import { auth } from '@/config/firebase';
+import { updateUserSchedule } from '@/services/dbServices';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text } from 'react-native';
 import AuthScreenLayout from '../screenTemplate';
 
 const onboardingDoneScreen = () => {
+  const [schedule, setSchedule] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const uploadImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      quality: 0.2,
+    });
+
+    if (!result.canceled) {
+      if (result.assets[0].base64) {
+        const base64Data = result.assets[0].base64;
+        setSchedule(base64Data);
+        console.log('image uploaded succesfully');
+      }
+    }
+  };
+
+  const callOpenAIAPI = async (base64Image: string, prompt: string) => {
+    console.log('Calling dummy openAIAPI');
+  };
+
+  const handleNext = () => {
+    const user = auth.currentUser;
+    if (schedule && user) {
+      updateUserSchedule(user.uid, schedule);
+      callOpenAIAPI(schedule, 'What do you see in this image?');
+      router.push('/(onboarding)/doneScreen');
+    } else {
+      setErrorMessage('Please upload schedule');
+    }
+  };
+
   return (
     <AuthScreenLayout
       headerContent={
@@ -14,9 +50,7 @@ const onboardingDoneScreen = () => {
       middleContent={
         <>
           <Pressable
-            onPress={() => {
-              // Doesn't do anything yet, should add function
-            }}
+            onPress={uploadImage}
             style={({ pressed }) => [
               styles.nextButton,
               {
@@ -34,10 +68,7 @@ const onboardingDoneScreen = () => {
       bottomContent={
         <>
           <Pressable
-            onPress={() => {
-              // add function to save user input
-              router.push('/(onboarding)/doneScreen');
-            }}
+            onPress={handleNext}
             style={({ pressed }) => [
               styles.nextButton,
               {
@@ -68,6 +99,9 @@ const onboardingDoneScreen = () => {
               </Text>
             )}
           </Pressable>
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
         </>
       }
     />
@@ -107,5 +141,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 18,
     textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    marginBottom: 8,
+    fontSize: 14,
   },
 });
