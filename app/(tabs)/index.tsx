@@ -9,7 +9,7 @@ import {
   getTodayKey,
   groupSchedule,
   timeToPosition,
-} from '@/logic/scheudleUtils';
+} from '@/logic/scheduleUtils';
 
 const mainAppPage = () => {
   const todayKey = getTodayKey();

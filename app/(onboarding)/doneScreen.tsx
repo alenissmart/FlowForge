@@ -1,16 +1,35 @@
 import { auth } from '@/config/firebase';
-import { setDoneOnboarding } from '@/services/dbServices';
+import { generateScheduleRecommendation } from '@/logic/coreAlgorithm';
+import {
+  getPreferences,
+  getSchedule,
+  setDoneOnboarding,
+  updateUserSchedule,
+} from '@/services/dbServices';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text } from 'react-native';
 import AuthScreenLayout from '../screenTemplate';
 
 const onboardingDoneScreen = () => {
-  const handleDone = () => {
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleDone = async () => {
     const user = auth.currentUser;
     if (user) {
-      setDoneOnboarding(user.uid);
-      router.replace('/(tabs)');
+      const userSched = await getSchedule(user.uid);
+      const userPrefs = await getPreferences(user.uid);
+      if (userSched && userPrefs) {
+        const recommendation = generateScheduleRecommendation(
+          userSched,
+          userPrefs,
+        );
+        updateUserSchedule(user.uid, recommendation);
+        setDoneOnboarding(user.uid);
+        router.replace('/(tabs)');
+      } else {
+        setErrorMessage('Missing schedule or preferences.');
+      }
     }
   };
 
@@ -64,6 +83,9 @@ const onboardingDoneScreen = () => {
               </Text>
             )}
           </Pressable>
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
         </>
       }
     />
@@ -109,5 +131,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 18,
     textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    marginBottom: 8,
+    fontSize: 14,
   },
 });
