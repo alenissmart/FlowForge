@@ -23,7 +23,8 @@ export const analyzeImage = async (base64Image: string, prompt: string) => {
     return text;
   } catch (error) {
     console.log('error analyzing image, returning base schedule:', error);
-    // throw new Error('Failed to analyze image. Please try again later.');
-    return "{'monday': {}, 'tuesday': {}, 'wednesday': {}, 'thursday': {}, 'friday': {}}";
+    // switch the error off for testing, and switch on the return of the base schedule.
+    throw new Error('Failed to analyze image. Please try again later.');
+    // return "{'monday': {}, 'tuesday': {}, 'wednesday': {}, 'thursday': {}, 'friday': {}}";
   }
 };

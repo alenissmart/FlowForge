@@ -1,4 +1,4 @@
-export function generateScheduleRecommendation(
+export async function generateScheduleRecommendation(
   schedule: string,
   preferences: Record<string, string>,
 ) {
