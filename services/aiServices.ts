@@ -22,7 +22,6 @@ export const analyzeImage = async (base64Image: string, prompt: string) => {
     const text = result.response.text();
     return text;
   } catch (error) {
-    console.error(' AI error:', error);
-    return null;
+    throw new Error('Failed to analyze image. Please try again later.');
   }
 };

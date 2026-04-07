@@ -33,6 +33,7 @@ const onboardingDoneScreen = () => {
     try {
       const user = auth.currentUser;
       if (schedule && user) {
+        setErrorMessage('');
         const example_json =
           "{'monday': {'08:30': 'CIS4301', '08:35': 'CIS4301', ..., '14:35': 'CIS4930' '14:40': 'CIS4930'}, ..., 'Friday': { '09:35': 'COP4533', '09:40': 'COP4533', ... '14:35': 'CIS4930', '14:40': 'CIS4930'}}";
         const result = await analyzeImage(
@@ -43,7 +44,7 @@ Context: The Image is attached, and is in the form of base64 string. It should b
 
 Format if there is a valid schedule attached: ${example_json}
 
-Format if there is there is no valid schedule attached, or if you there is anything that is hindering you from performing the task exactly as described: {}`,
+Format if there is there is no valid schedule attached, or if you there is anything that is hindering you from performing the task exactly as described: {'monday': {}, 'tuesday': {}, 'wednesday': {}, 'thursday': {}, 'friday': {}}`,
         );
         ``;
         if (result != null) {
@@ -53,6 +54,10 @@ Format if there is there is no valid schedule attached, or if you there is anyth
       } else {
         setErrorMessage('Please upload schedule');
       }
+    } catch (error) {
+      setErrorMessage('Error processing schedule. Please try later.');
+      setIsLoading(false);
+      setSchedule('');
     } finally {
       setIsLoading(false);
     }
@@ -69,16 +74,26 @@ Format if there is there is no valid schedule attached, or if you there is anyth
         <>
           <Pressable
             onPress={uploadImage}
+            disabled={isLoading}
             style={({ pressed }) => [
               styles.nextButton,
               {
+                backgroundColor: 'transparent',
                 transform: pressed ? [{ scale: 0.95 }] : [{ scale: 1 }],
               },
             ]}
           >
             <Image
               source={require('../../assets/images/temp_upload_icon.png')}
-              style={styles.upload_icon}
+              style={[
+                styles.upload_icon,
+                {
+                  borderColor: schedule
+                    ? 'rgb(37, 37, 37)'
+                    : 'rgb(184, 184, 184)',
+                  opacity: schedule ? 1 : 0.8,
+                },
+              ]}
             />
           </Pressable>
         </>
@@ -124,6 +139,11 @@ Format if there is there is no valid schedule attached, or if you there is anyth
           {errorMessage ? (
             <Text style={styles.errorText}>{errorMessage}</Text>
           ) : null}
+          {isLoading ? (
+            <Text style={{ marginTop: 10, fontSize: 16, color: '#555' }}>
+              Processing schedule may be slow.
+            </Text>
+          ) : null}
         </>
       }
     />
@@ -145,6 +165,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 80,
     marginBottom: 100,
+    borderWidth: 4,
+    borderColor: 'rgba(163,51,58,1)',
   },
   nextButton: {
     width: 200,
