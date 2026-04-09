@@ -287,16 +287,19 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    width: '100%',
-    maxWidth: 354,
-    height: 150,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    marginBottom: 20,
+  width: '100%',
+  maxWidth: 354,
+  height: 150,
+  backgroundColor: 'white',
+  borderRadius: 15,
+  marginBottom: 20,
+  justifyContent: 'center',
+  overflow: 'hidden',
   },
 
   pickerItem: {
-    fontSize: 20,
+  color: 'black',
+  fontSize: 20,
   },
 
   sectionTitle: {
