@@ -30,6 +30,8 @@ type DayStudyInfo = {
   day: string;
   morningFrom: number;
   morningTo: number;
+  afternoonFrom: number;
+  afternoonTo: number;
   eveningFrom: number;
   eveningTo: number;
   share: number;
@@ -563,9 +565,9 @@ function placeAllForcedRelax(
 
 // --- Step 5: Fill remaining slots ---
 
-// Distributes remaining study budget equally across weekdays, prioritising morning
-// then evening windows. Redistributes unabsorbed slots by extending existing study
-// blocks on days with least study placed. Fills all leftover slots with relax.
+// Distributes remaining study budget equally across weekdays, prioritising afternoon
+// then morning then evening windows. Redistributes unabsorbed slots by extending
+// existing study blocks on days with least study placed. Fills all leftover slots with relax.
 function fillRemainingSlots(
   parsedSchedule: WeeklySchedule,
   weekdays: string[],
@@ -595,9 +597,10 @@ function fillRemainingSlots(
       sleepMinutes,
     );
 
-    // Windows naturally exclude forced relax since those slots are already filled
     const morningFrom = breakfast ? breakfast.end : wakeMinutes;
     const morningTo = lunch ? lunch.start : sleepMinutes;
+    const afternoonFrom = lunch ? lunch.end : wakeMinutes;
+    const afternoonTo = dinner ? dinner.start : sleepMinutes;
     const eveningFrom = dinner ? dinner.end : wakeMinutes;
     const eveningTo = sleepMinutes;
 
@@ -605,6 +608,8 @@ function fillRemainingSlots(
       day,
       morningFrom,
       morningTo,
+      afternoonFrom,
+      afternoonTo,
       eveningFrom,
       eveningTo,
       share: perDayBase + (index < remainder ? 1 : 0),
@@ -612,12 +617,13 @@ function fillRemainingSlots(
     };
   });
 
-  // --- 2b: Pass 1 - Fill each day's share, morning first then evening ---
+  // --- 2b: Pass 1 - Fill each day's share, afternoon first then morning then evening ---
   for (const info of dayStudyInfos) {
     const daySchedule = parsedSchedule[info.day];
     let remaining = info.share;
 
     const windows = [
+      { from: info.afternoonFrom, to: info.afternoonTo },
       { from: info.morningFrom, to: info.morningTo },
       { from: info.eveningFrom, to: info.eveningTo },
     ];
@@ -625,9 +631,9 @@ function fillRemainingSlots(
     for (const window of windows) {
       if (remaining < STUDY_MIN_SLOTS) break;
 
-      const blocks = getFreeBlocks(daySchedule, window.from, window.to)
-        .filter((block) => (block.end - block.start) / 5 >= STUDY_MIN_SLOTS)
-        .sort((a, b) => b.end - b.start - (a.end - a.start)); // largest first
+      const blocks = getFreeBlocks(daySchedule, window.from, window.to).filter(
+        (block) => (block.end - block.start) / 5 >= STUDY_MIN_SLOTS,
+      );
 
       for (const block of blocks) {
         if (remaining < STUDY_MIN_SLOTS) break;
@@ -654,7 +660,6 @@ function fillRemainingSlots(
   );
 
   if (redistributionPool > 0) {
-    // Days with least study placed get redistribution first
     const sortedByPlaced = [...dayStudyInfos].sort(
       (a, b) => a.actuallyPlaced - b.actuallyPlaced,
     );
@@ -663,11 +668,12 @@ function fillRemainingSlots(
       if (redistributionPool <= 0) break;
       const daySchedule = parsedSchedule[info.day];
 
-      // Find existing study block in morning then evening
+      // Find existing study block, afternoon first then morning then evening
       let studyStart: number | null = null;
       let studyEnd: number | null = null;
 
       const windows = [
+        { from: info.afternoonFrom, to: info.afternoonTo },
         { from: info.morningFrom, to: info.morningTo },
         { from: info.eveningFrom, to: info.eveningTo },
       ];
@@ -678,7 +684,7 @@ function fillRemainingSlots(
             if (studyStart === null) studyStart = t;
             studyEnd = t + 5;
           } else if (studyStart !== null) {
-            break outer; // found end of study block
+            break outer;
           }
         }
       }
@@ -688,10 +694,16 @@ function fillRemainingSlots(
       // Extend at end first
       while (redistributionPool > 0) {
         const slot = minutesTo24HourString(studyEnd);
-        const inMorning = studyEnd < info.morningTo;
+        const inAfternoon =
+          studyEnd >= info.afternoonFrom && studyEnd < info.afternoonTo;
+        const inMorning =
+          studyEnd >= info.morningFrom && studyEnd < info.morningTo;
         const inEvening =
           studyEnd >= info.eveningFrom && studyEnd < info.eveningTo;
-        if ((inMorning || inEvening) && daySchedule[slot] === '') {
+        if (
+          (inAfternoon || inMorning || inEvening) &&
+          daySchedule[slot] === ''
+        ) {
           daySchedule[slot] = 'Study';
           budget.study -= 1;
           info.actuallyPlaced += 1;
@@ -706,10 +718,16 @@ function fillRemainingSlots(
       while (redistributionPool > 0) {
         const prevTime = studyStart - 5;
         const slot = minutesTo24HourString(prevTime);
-        const inMorning = prevTime >= info.morningFrom;
+        const inAfternoon =
+          prevTime >= info.afternoonFrom && prevTime < info.afternoonTo;
+        const inMorning =
+          prevTime >= info.morningFrom && prevTime < info.morningTo;
         const inEvening =
           prevTime >= info.eveningFrom && prevTime < info.eveningTo;
-        if ((inMorning || inEvening) && daySchedule[slot] === '') {
+        if (
+          (inAfternoon || inMorning || inEvening) &&
+          daySchedule[slot] === ''
+        ) {
           daySchedule[slot] = 'Study';
           budget.study -= 1;
           info.actuallyPlaced += 1;
@@ -722,9 +740,33 @@ function fillRemainingSlots(
     }
   }
 
-  // --- Step 3: Fill all remaining empty slots with relax ---
+  // --- Step 3: Absorb short gaps adjacent to study blocks, then fill rest with relax ---
   for (const day of weekdays) {
-    fillFreeWith(parsedSchedule[day], wakeMinutes, sleepMinutes, 'Relax');
+    const daySchedule = parsedSchedule[day];
+    const freeBlocks = getFreeBlocks(daySchedule, wakeMinutes, sleepMinutes);
+
+    for (const block of freeBlocks) {
+      const blockSlots = (block.end - block.start) / 5;
+      if (blockSlots >= STUDY_MIN_SLOTS) continue; // only care about short gaps
+
+      // Check if adjacent to a study block at either end
+      const slotBefore = minutesTo24HourString(block.start - 5);
+      const slotAfter = minutesTo24HourString(block.end);
+      const adjacentToStudy =
+        daySchedule[slotBefore] === 'Study' ||
+        daySchedule[slotAfter] === 'Study';
+
+      if (adjacentToStudy) {
+        // Extend study into this short gap
+        for (let t = block.start; t < block.end; t += 5) {
+          daySchedule[minutesTo24HourString(t)] = 'Study';
+          budget.study -= 1;
+        }
+      }
+    }
+
+    // Fill everything remaining with relax
+    fillFreeWith(daySchedule, wakeMinutes, sleepMinutes, 'Relax');
   }
 }
 
