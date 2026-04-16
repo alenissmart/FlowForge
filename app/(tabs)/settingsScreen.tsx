@@ -80,7 +80,6 @@ const settingPage = () => {
   }, []);
 
   const handleSave = async () => {
-    console.log(scheduleJson);
     setIsLoading(true);
     try {
       const user = auth.currentUser;
@@ -128,7 +127,6 @@ const settingPage = () => {
             updateUserSchedule(user.uid, result);
           }
         }
-        console.log(scheduleJson);
         const userSched = scheduleJson;
         const userPrefs = {
           exercise: +prefValues['exercise'],
