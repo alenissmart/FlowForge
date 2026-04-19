@@ -13,7 +13,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-console.log;
 const mainAppPage = () => {
   const [scheduleData, setScheduleData] = useState(schedule);
   const [errorMessage, setErrorMessage] = useState('');
@@ -21,12 +20,10 @@ const mainAppPage = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('calling use effect');
       const fetchData = async () => {
         const baseUser = auth.currentUser;
         if (baseUser) {
           const data = await getGeneratedSchedule(baseUser.uid);
-          console.log(data);
           try {
             const jsonData = JSON.parse(data);
             setScheduleData(jsonData);

@@ -1,7 +1,7 @@
 import { auth } from '@/config/firebase';
-import { getSchedule } from '@/services/dbServices';
+import { getGeneratedSchedule } from '@/services/dbServices';
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import AuthScreenLayout from '../screenTemplate';
 
@@ -11,21 +11,40 @@ const RADIUS = (SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const activityConfig: any = {
-  exercise: { color: '#FF6B6B', emoji: '💪', messages: ['Push it.', 'Stay strong.', 'Keep going.'] },
-  study: { color: '#4D96FF', emoji: '📚', messages: ['Lock in.', 'Focus up.', 'Stay sharp.'] },
-  relax: { color: '#6BCB77', emoji: '🧘', messages: ['Breathe.', 'Slow down.', 'Reset.'] },
-  meal: { color: '#FFD93D', emoji: '🍽️', messages: ['Eat well.', 'Fuel up.', 'Take your time.'] },
-  class: { color: '#845EC2', emoji: '🏫', messages: ['Stay engaged.', 'Pay attention.', 'Take notes.'] },
+  exercise: {
+    color: '#FF6B6B',
+    emoji: '💪',
+    messages: ['Push it.', 'Stay strong.', 'Keep going.'],
+  },
+  study: {
+    color: '#4D96FF',
+    emoji: '📚',
+    messages: ['Lock in.', 'Focus up.', 'Stay sharp.'],
+  },
+  relax: {
+    color: '#6BCB77',
+    emoji: '🧘',
+    messages: ['Breathe.', 'Slow down.', 'Reset Your Thoughts.'],
+  },
+  meal: {
+    color: '#FFD93D',
+    emoji: '🍽️',
+    messages: ['Eat well.', 'Fuel up.', 'Take your time.'],
+  },
+  class: {
+    color: '#845EC2',
+    emoji: '🏫',
+    messages: ['Stay engaged.', 'Pay attention.', 'Take notes.'],
+  },
 };
 
 const exerciseCycle = [
-  { name: 'Stretch', time: 20 },
-  { name: 'Rest', time: 10 },
-  { name: 'Push-ups', time: 20 },
-  { name: 'Rest', time: 10 },
-  { name: 'Plank', time: 20 },
-  { name: 'Rest', time: 10 },
-  { name: 'Sit-ups', time: 20 },
+  { name: 'Set-up exercise', time: 90 },
+  { name: 'Set 1', time: 60 },
+  { name: 'rest', time: 30 },
+  { name: 'Set 2', time: 60 },
+  { name: 'rest', time: 30 },
+  { name: 'Set 3', time: 60 },
   { name: 'Rest', time: 10 },
 ];
 
@@ -58,20 +77,25 @@ const activityPage = () => {
   };
 
   const getDayKey = () => {
-    return new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    return new Date()
+      .toLocaleDateString('en-US', { weekday: 'long' })
+      .toLowerCase();
   };
 
   const loadActivityFromSchedule = async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const schedule = await getSchedule(user.uid);
+    const schedule = await getGeneratedSchedule(user.uid);
+    const schedule_json = JSON.parse(schedule);
     if (!schedule) return;
 
     const day = getDayKey();
+    console.log(day);
     const time = getCurrentTimeKey();
-
-    const value = schedule?.[day]?.[time];
+    console.log(time);
+    const value = schedule_json[day]?.[time];
+    console.log(value);
 
     if (!value) {
       setActivity('relax');
@@ -107,9 +131,12 @@ const activityPage = () => {
 
     let current;
 
-    if (activity === 'exercise') current = exerciseCycle[subIndex % exerciseCycle.length];
-    else if (activity === 'study') current = studyCycle[subIndex % studyCycle.length];
-    else if (activity === 'relax') current = relaxCycle[subIndex % relaxCycle.length];
+    if (activity === 'exercise')
+      current = exerciseCycle[subIndex % exerciseCycle.length];
+    else if (activity === 'study')
+      current = studyCycle[subIndex % studyCycle.length];
+    else if (activity === 'relax')
+      current = relaxCycle[subIndex % relaxCycle.length];
 
     if (!current) return;
 
@@ -133,9 +160,12 @@ const activityPage = () => {
   }, [timeLeft, activity]);
 
   const getCurrentSub = () => {
-    if (activity === 'exercise') return exerciseCycle[subIndex % exerciseCycle.length].name;
-    if (activity === 'study') return studyCycle[subIndex % studyCycle.length].name;
-    if (activity === 'relax') return relaxCycle[subIndex % relaxCycle.length].name;
+    if (activity === 'exercise')
+      return exerciseCycle[subIndex % exerciseCycle.length].name;
+    if (activity === 'study')
+      return studyCycle[subIndex % studyCycle.length].name;
+    if (activity === 'relax')
+      return relaxCycle[subIndex % relaxCycle.length].name;
     return '';
   };
 
@@ -149,8 +179,8 @@ const activityPage = () => {
     activity === 'class' || activity === 'meal'
       ? 0
       : totalTime > 0
-      ? timeLeft / totalTime
-      : 0;
+        ? timeLeft / totalTime
+        : 0;
 
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
@@ -158,7 +188,9 @@ const activityPage = () => {
     <AuthScreenLayout
       headerContent={
         <View style={{ alignItems: 'center' }}>
-          <Text style={[styles.title, { color: activityConfig[activity].color }]}>
+          <Text
+            style={[styles.title, { color: activityConfig[activity].color }]}
+          >
             {activity.toUpperCase()}
           </Text>
           {activity === 'class' && (
@@ -215,13 +247,18 @@ const activityPage = () => {
         </View>
       }
       bottomContent={
-        <View style={styles.buttonRow}>
-          {Object.keys(activityConfig).map((key) => (
-            <Pressable key={key} onPress={() => setActivity(key)} style={styles.button}>
-              <Text>{key}</Text>
-            </Pressable>
-          ))}
-        </View>
+        // <View style={styles.buttonRow}>
+        //   {Object.keys(activityConfig).map((key) => (
+        //     <Pressable
+        //       key={key}
+        //       onPress={() => setActivity(key)}
+        //       style={styles.button}
+        //     >
+        //       <Text>{key}</Text>
+        //     </Pressable>
+        //   ))}
+        // </View>
+        <></>
       }
     />
   );
